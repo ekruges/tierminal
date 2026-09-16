@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2
+
+- The menu bar item pulses slowly in the last 10% of a division and quickly once a rank-up is waiting; clicking
+  it then plays the reveal. Rank-ups no longer open the reveal on their own.
+
 ## 1.0.1
 
 - History and transcript imports run automatically every 90 seconds; the Backfill button is gone (Rescan all

@@ -88,6 +88,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var setupWindow: NSWindow?
     private var launched = false
     private var setupChecked = false
+    private var pending: Snapshot?
+    private var pulseTimer: Timer?
+    private var pulseOn = false
 
     func applicationDidFinishLaunching(_ note: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -144,15 +147,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return img
     }
 
+    private var rendering = false
+
     private func render() {
-        guard let b = item.button else { return }
+        guard !rendering, let b = item.button else { return }
+        rendering = true
+        defer { rendering = false }
         guard let s = store.stats else {
             b.title = store.error == nil ? " …" : " !"
             return
         }
         let title = MenuBar.title(s)
         b.image = MenuBar.showEmblem || title.isEmpty ? statusImage(s) : nil
-        b.title = title.isEmpty ? "" : " " + title
+        b.title = (title.isEmpty ? "" : " " + title) + (pending != nil ? " ▲" : "")
+        updatePulse(s)
         if !setupChecked {
             setupChecked = true
             checkSetup()
@@ -200,15 +208,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let seen = d.integer(forKey: "seen.rankKey")
         if seen == 0 {
             showReveal(from: nil, to: s)
+            saveSeen(s)
         } else if s.rankKey > seen {
-            showReveal(from: Snapshot(total: d.integer(forKey: "seen.total"), xp: d.integer(forKey: "seen.xp"), rankKey: seen), to: s)
-        } else if launched {
-            return
+            if pending == nil {
+                pending = Snapshot(total: d.integer(forKey: "seen.total"), xp: d.integer(forKey: "seen.xp"), rankKey: seen)
+                updatePulse(s)
+            }
+        } else if !launched {
+            launched = true
+            saveSeen(s)
         }
         launched = true
+    }
+
+    private func saveSeen(_ s: Stats) {
+        let d = UserDefaults.standard
         d.set(s.rankKey, forKey: "seen.rankKey")
         d.set(s.total, forKey: "seen.total")
         d.set(s.xp, forKey: "seen.xp")
+    }
+
+    private func updatePulse(_ s: Stats) {
+        let near = s.divEnd != nil && s.progress >= 0.9
+        let interval: Double? = pending != nil ? 0.55 : (near ? 1.4 : nil)
+        guard let interval else {
+            pulseTimer?.invalidate()
+            pulseTimer = nil
+            item.button?.alphaValue = 1
+            return
+        }
+        if let t = pulseTimer, abs(t.timeInterval - interval) < 0.01 { return }
+        pulseTimer?.invalidate()
+        pulseTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
+            guard let self, let b = self.item.button else { return }
+            self.pulseOn.toggle()
+            NSAnimationContext.runAnimationGroup { ctx in
+                ctx.duration = interval * 0.9
+                b.animator().alphaValue = self.pulseOn ? 0.35 : 1
+            }
+        }
     }
 
     private func showReveal(from: Snapshot?, to s: Stats) {
@@ -232,6 +270,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func clicked() {
         if NSApp.currentEvent?.type == .rightMouseUp { showMenu(); return }
         guard let b = item.button else { return }
+        if let p = pending, let s = store.stats {
+            pending = nil
+            saveSeen(s)
+            updatePulse(s)
+            b.title = b.title.replacingOccurrences(of: " ▲", with: "")
+            showReveal(from: p, to: s)
+            return
+        }
         if popover.isShown { popover.performClose(nil); return }
         statusCache.removeAll()
         store.opens += 1
