@@ -323,7 +323,6 @@ struct DashboardContent: View {
             Spacer()
             Button("Settings", action: openSettings)
             if !s.remotes.isEmpty { Button(store.busy ? "Syncing" : "Sync") { store.sync() }.disabled(store.busy) }
-            Button(store.busy ? "Backfilling" : "Backfill") { store.backfill() }.disabled(store.busy)
             Button("Quit") { NSApp.terminate(nil) }
         }
     }

@@ -44,7 +44,7 @@ final class StatsStore: ObservableObject {
         }
     }
 
-    func backfill() { longRun(["backfill"]) }
+    func backfill() { longRun(["rescan"]) }
     func sync() { longRun(["sync"]) }
 
     func exec(_ args: [String], _ done: @escaping (String) -> Void) {
@@ -106,7 +106,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.render()
         }
         store.refresh()
-        Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in self?.store.refresh() }
+        Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in self?.store.refresh() }
         Timer.scheduledTimer(withTimeInterval: 600, repeats: true) { [weak self] _ in
             guard let self, let s = self.store.stats, !s.remotes.isEmpty, !self.store.busy else { return }
             self.store.sync()
@@ -245,7 +245,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         m.addItem(withTitle: "Refresh", action: #selector(refresh), keyEquivalent: "")
         m.addItem(withTitle: "Replay rank reveal", action: #selector(replay), keyEquivalent: "")
         m.addItem(withTitle: "Run setup again", action: #selector(setupAgain), keyEquivalent: "")
-        m.addItem(withTitle: "Backfill history", action: #selector(backfill), keyEquivalent: "")
+        m.addItem(withTitle: "Rescan all history", action: #selector(backfill), keyEquivalent: "")
         m.addItem(withTitle: "Sync remote machines", action: #selector(sync), keyEquivalent: "")
         m.addItem(.separator())
         m.addItem(withTitle: "Copy share card", action: #selector(copyCard), keyEquivalent: "c")

@@ -696,8 +696,25 @@ def reclassify(db):
     db.commit()
     return len(upd)
 
+AUTO_EVERY = 90
+
+
+def auto_backfill(db):
+    now = time.time()
+    if now - float(meta_get(db, "last_auto", "0")) < AUTO_EVERY:
+        return
+    meta_set(db, "last_auto", repr(now))
+    db.commit()
+    try:
+        backfill_history(db)
+        backfill_agents(db)
+    except (OSError, sqlite3.Error):
+        pass
+
+
 def stats(db):
     ingest(db)
+    auto_backfill(db)
     q = lambda sql, *a: db.execute(sql, a).fetchall()
     one = lambda sql, *a: db.execute(sql, a).fetchone()[0]
 

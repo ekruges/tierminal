@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1
+
+- History and transcript imports run automatically every 90 seconds; the Backfill button is gone (Rescan all
+  history stays in the menu). Menu bar refreshes every 30 seconds.
+
 ## 1.0.0
 
 - Menu bar rank and stats for every shell command you and any AI agent run.

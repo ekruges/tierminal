@@ -19,7 +19,7 @@ From source, with the Xcode command line tools:
 - Every interactive zsh or bash command, with timing and exit code.
 - Every command an AI agent runs through a shell. Claude Code has exact hooks; everything else is matched by its
   process tree against a registry of about 55 agents, with provider and model attribution. See [AGENTS.md](AGENTS.md).
-- History: zsh, Amazon Q, Claude Code transcripts, Codex rollouts.
+- History: zsh, Amazon Q, Claude Code transcripts, Codex rollouts, re-read for new entries every 90 seconds.
 - Other machines over ssh: `tierminal.py remote add <host>`.
 
 Only command text, timing and the names of agent env vars are recorded. Nothing leaves the machine.
