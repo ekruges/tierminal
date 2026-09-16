@@ -10,6 +10,7 @@ Records every shell command you and any AI agent run, scores them, ranks you.
   rescan      re-read every agent transcript from the start
   stats       ingest, then print the stats JSON the menu bar app renders
   setup shell | claude | status   wire the hooks (used by the app's first-run wizard and install.sh)
+  boost <xp>  add fake XP on top of the real total to preview ranks; boost 0 clears it
   remote add <ssh-host> | remote rm <ssh-host> | remote list
   sync        pull new events from every remote machine
 
@@ -723,7 +724,7 @@ def stats(db):
     ssh_s = one("SELECT COALESCE(SUM(MIN(dur,?)),0) FROM commands WHERE kind='ssh' AND dur IS NOT NULL", SSH_DUR_CAP)
     mon_s = one("SELECT COALESCE(SUM(MIN(dur,?)),0) FROM commands WHERE kind='monitor' AND dur IS NOT NULL", SSH_DUR_CAP)
     xp_ssh, xp_mon = int(ssh_s // 60), int(mon_s // 60)
-    xp = total + xp_ssh + xp_mon
+    xp = total + xp_ssh + xp_mon + int(meta_get(db, "xp_offset", "0"))
     r = rank(xp)
 
     per_day = {}
@@ -844,6 +845,10 @@ def main(argv):
         print("agents: %s" % backfill_agents(db))
     elif cmd == "reclassify":
         print(reclassify(db))
+    elif cmd == "boost":
+        meta_set(db, "xp_offset", str(int(argv[2]) if len(argv) > 2 else 0))
+        db.commit()
+        print(meta_get(db, "xp_offset", "0"))
     elif cmd == "setup":
         setup(db, argv[2:])
     elif cmd == "remote":

@@ -214,7 +214,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 pending = Snapshot(total: d.integer(forKey: "seen.total"), xp: d.integer(forKey: "seen.xp"), rankKey: seen)
                 updatePulse(s)
             }
-        } else if !launched {
+        } else if !launched || s.rankKey < seen {
             launched = true
             saveSeen(s)
         }
