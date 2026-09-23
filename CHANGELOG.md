@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+- Easier XP curve grounded in realistic command counts: Bronze 100, Silver 500, Gold 2,000, Platinum 6,000,
+  Diamond 15,000, Ascendant 30,000, Immortal 60,000, Radiant 120,000, Root 200,000.
+
 ## 1.0.2
 
 - The menu bar item pulses slowly in the last 10% of a division and quickly once a rank-up is waiting; clicking

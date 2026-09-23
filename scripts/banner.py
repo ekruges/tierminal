@@ -6,9 +6,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = os.path.join(ROOT, "emblems")
 W, H = 1600, 760
 BG = (20, 20, 22)
-TIERS = [("iron-3", "Iron", "0"), ("bronze-3", "Bronze", "1k"), ("silver-3", "Silver", "3k"), ("gold-3", "Gold", "8k"),
-         ("platinum-3", "Platinum", "20k"), ("diamond-3", "Diamond", "50k"), ("ascendant-3", "Ascendant", "120k"),
-         ("immortal-3", "Immortal", "300k"), ("radiant-3", "Radiant", "750k"), ("root", "Root", "1M")]
+TIERS = [("iron-3", "Iron", "0"), ("bronze-3", "Bronze", "100"), ("silver-3", "Silver", "500"), ("gold-3", "Gold", "2k"),
+         ("platinum-3", "Platinum", "6k"), ("diamond-3", "Diamond", "15k"), ("ascendant-3", "Ascendant", "30k"),
+         ("immortal-3", "Immortal", "60k"), ("radiant-3", "Radiant", "120k"), ("root", "Root", "200k")]
 COLORS = [(142, 142, 147), (181, 101, 45), (154, 163, 173), (224, 165, 42), (47, 182, 171), (79, 123, 232),
           (47, 180, 85), (217, 49, 95), (242, 242, 242), (217, 4, 41)]
 

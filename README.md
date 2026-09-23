@@ -28,13 +28,15 @@ Only command text, timing and the names of agent env vars are recorded. Nothing 
 
 | Tier | XP | | Tier | XP |
 |------|----|-|------|----|
-| Iron | 0 | | Diamond | 50,000 |
-| Bronze | 1,000 | | Ascendant | 120,000 |
-| Silver | 3,000 | | Immortal | 300,000 |
-| Gold | 8,000 | | Radiant | 750,000 |
-| Platinum | 20,000 | | Root | 1,000,000 |
+| Iron | 0 | | Diamond | 15,000 |
+| Bronze | 100 | | Ascendant | 30,000 |
+| Silver | 500 | | Immortal | 60,000 |
+| Gold | 2,000 | | Radiant | 120,000 |
+| Platinum | 6,000 | | Root | 200,000 |
 
-Three divisions per tier, Root has none. Drop your own art into `~/Library/Application Support/Tierminal/emblems/`
+Three divisions per tier, Root has none. XP is one point per command plus one per minute inside ssh or a
+monitoring tool, so a hundred commands a day reaches Gold in three weeks and Diamond in five months; agents running
+hundreds a day get to Root within a year. Drop your own art into `~/Library/Application Support/Tierminal/emblems/`
 as `gold-3.png`, `root.png` and so on to replace the bundled set.
 
 MIT license.

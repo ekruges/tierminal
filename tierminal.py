@@ -39,7 +39,7 @@ MACHINE = socket.gethostname().split(".")[0]
 LOG_ROTATE_AT = 32 * 1024 * 1024
 
 TIERS = ["Iron", "Bronze", "Silver", "Gold", "Platinum", "Diamond", "Ascendant", "Immortal", "Radiant", "Root"]
-BASES = [0, 1000, 3000, 8000, 20000, 50000, 120000, 300000, 750000, 1000000]
+BASES = [0, 100, 500, 2000, 6000, 15000, 30000, 60000, 120000, 200000]
 ROMAN = ["", "I", "II", "III"]
 
 AGENTS = [
