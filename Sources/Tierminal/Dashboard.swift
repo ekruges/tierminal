@@ -407,9 +407,14 @@ struct YearHeatmap: View {
     var body: some View {
         let cols = (heat.count + 6) / 7
         let m = max(1, heat.max() ?? 1)
+        let font = NSFont.systemFont(ofSize: cell * 1.5)
+        let shown = months.indices.filter { k in
+            k + 1 == months.count || CGFloat(months[k + 1].col - months[k].col) * (cell + gap)
+                >= NSString(string: months[k].label).size(withAttributes: [.font: font]).width + gap
+        }.map { months[$0] }
         VStack(alignment: .leading, spacing: 3) {
             ZStack(alignment: .topLeading) {
-                ForEach(months, id: \.col) { mo in
+                ForEach(shown, id: \.col) { mo in
                     Text(mo.label).font(.system(size: cell * 1.5)).foregroundStyle(.secondary)
                         .offset(x: CGFloat(mo.col) * (cell + gap))
                 }

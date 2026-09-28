@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.2
+
+- Heatmap month labels no longer collide: a label is skipped when the next month starts before it would
+  fit, which drops the leading partial-month label on the share card and in the popover.
+
 ## 1.1.1
 
 - Verified and documented that subagent commands are counted: Claude Code's hooks fire for subagent-issued Bash
