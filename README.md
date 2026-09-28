@@ -17,8 +17,10 @@ From source, with the Xcode command line tools:
 ## What is counted
 
 - Every interactive zsh or bash command, with timing and exit code.
-- Every command an AI agent runs through a shell. Claude Code has exact hooks; everything else is matched by its
-  process tree against a registry of about 55 agents, with provider and model attribution. See [AGENTS.md](AGENTS.md).
+- Every command an AI agent runs through a shell, subagents included: Claude Code's hooks fire for every Bash
+  call regardless of which agent or subagent issued it, and its own transcript files (including subagent and
+  workflow transcripts) are scanned as a fallback. Everything else is matched by its process tree against a
+  registry of about 55 agents, with provider and model attribution. See [AGENTS.md](AGENTS.md).
 - History: zsh, Amazon Q, Claude Code transcripts, Codex rollouts, re-read for new entries every 90 seconds.
 - Other machines over ssh: `tierminal.py remote add <host>`.
 

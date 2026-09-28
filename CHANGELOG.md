@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1
+
+- Verified and documented that subagent commands are counted: Claude Code's hooks fire for subagent-issued Bash
+  calls the same as top-level ones, and transcript scanning already recurses into subagent and workflow
+  transcript files.
+
 ## 1.1.0
 
 - Easier XP curve grounded in realistic command counts: Bronze 100, Silver 500, Gold 2,000, Platinum 6,000,
