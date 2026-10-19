@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.3
+
+- A corrupted database no longer takes the app down: the damaged file is set aside as tierminal.db.corrupt-<time> and
+  a fresh one is rebuilt automatically from the live log, agent transcripts and shell history. Only true corruption
+  triggers this, never a busy or locked database.
+- The database now runs in WAL mode, which survives a crash or power loss without corruption.
+
 ## 1.1.2
 
 - Heatmap month labels no longer collide: a label is skipped when the next month starts before it would

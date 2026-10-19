@@ -19,6 +19,7 @@ Capture paths: the zsh/bash hooks log every interactive command and every
 that ancestry against AGENTS, so any agent that spawns a shell is attributed
 without a per-agent integration.
 """
+import fcntl
 import hashlib
 import json
 import os
@@ -241,8 +242,7 @@ def row(id_, source, ts, dur, rc, cwd, cmd, session="", model="", machine=MACHIN
     provider = "" if source == "user" else provider_of(model, source, markers)
     return (id_, source, ts, dur, rc, cwd, cmd, name, kind, host, int(sudo), session, model or "", provider, machine)
 
-def open_db():
-    os.makedirs(DATA, exist_ok=True)
+def _open():
     db = sqlite3.connect(DB, timeout=10)
     db.executescript("""
         CREATE TABLE IF NOT EXISTS commands (
@@ -252,6 +252,11 @@ def open_db():
         CREATE INDEX IF NOT EXISTS commands_kind ON commands(kind);
         CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
     """)
+    try:
+        db.execute("PRAGMA journal_mode=WAL")
+        db.execute("PRAGMA synchronous=NORMAL")
+    except sqlite3.OperationalError:
+        pass
     have = {r[1] for r in db.execute("PRAGMA table_info(commands)")}
     for col in ("model", "provider", "machine"):
         if col not in have:
@@ -260,6 +265,46 @@ def open_db():
     db.execute("UPDATE commands SET provider='anthropic' WHERE source='claude' AND provider IS NULL")
     db.commit()
     return db
+
+
+def corrupt(e):
+    return type(e) is sqlite3.DatabaseError
+
+
+def healthy():
+    try:
+        c = sqlite3.connect(DB, timeout=10)
+        ok = c.execute("PRAGMA quick_check").fetchone()[0] == "ok"
+        c.close()
+        return ok
+    except sqlite3.DatabaseError as e:
+        if not corrupt(e):
+            raise
+        return False
+
+
+def heal():
+    with open(DB + ".heal", "w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if os.path.exists(DB) and not healthy():
+            os.replace(DB, "%s.corrupt-%d" % (DB, int(time.time())))
+            for ext in ("-wal", "-shm", "-journal"):
+                try:
+                    os.remove(DB + ext)
+                except OSError:
+                    pass
+
+
+def open_db():
+    os.makedirs(DATA, exist_ok=True)
+    try:
+        return _open()
+    except sqlite3.DatabaseError as e:
+        if not corrupt(e):
+            raise
+    heal()
+    return _open()
+
 
 def meta_get(db, key, default):
     r = db.execute("SELECT value FROM meta WHERE key=?", (key,)).fetchone()
@@ -834,6 +879,16 @@ def main(argv):
     if cmd == "hook":
         hook()
         return
+    try:
+        run(cmd, argv)
+    except sqlite3.DatabaseError as e:
+        if not corrupt(e):
+            raise
+        heal()
+        run(cmd, argv)
+
+
+def run(cmd, argv):
     db = open_db()
     if cmd == "ingest":
         print(ingest(db))
